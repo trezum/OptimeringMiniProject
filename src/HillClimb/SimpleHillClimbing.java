@@ -56,37 +56,37 @@ public class SimpleHillClimbing {
 	private ArrayList<Double> getBestNeighbourPoint(ArrayList<Double> point, double stepSize, int neighbours){
 		ArrayList<Double> bestNeighbourPoint = getNeighbourPoint(point, stepSize);
 		double bestNeighbour = curProblem.Eval(bestNeighbourPoint);
+		int betterNeighbourCounter = 0;
 		for (int i = 0; i < neighbours-1; i++) {
 			ArrayList<Double> newNeighbour = getNeighbourPoint(point, stepSize);
 			double newNeighborEvaluation = curProblem.Eval(newNeighbour);
 			if (newNeighborEvaluation > bestNeighbour){
+				betterNeighbourCounter++;
 				bestNeighbourPoint = newNeighbour;
 				bestNeighbour = newNeighborEvaluation;
 			}
 		}
-
-		if (bestNeighbourPoint.isEmpty())
-			System.out.println(	"Empty?!");
+		//System.out.println("Better neighbors found:" + betterNeighbourCounter);
 		return bestNeighbourPoint;
 	}
-
 
 	private ArrayList<Double> getNeighbourPoint(ArrayList<Double> point, double stepSize){
 		ArrayList<Double> neighbourPoint = new ArrayList<Double>();
 
 		for (int i = 0; i < curProblem.getDimensions(); i++) {
 			double newParam;
-			if (Math.random() > 0.5)
-			{
+			if (Math.random() > 0.5){
 				newParam = point.get(i) - Math.random() * stepSize;
-				if (newParam < curProblem.getMinValues().get(i));
+				if (newParam < curProblem.getMinValues().get(i)) {
 					newParam = curProblem.getMinValues().get(i);
+				}
 			}
 			else
 			{
 				newParam = point.get(i) + Math.random() * stepSize;
-				if (newParam > curProblem.getMaxValues().get(i));
+				if (newParam > curProblem.getMaxValues().get(i)) {
 					newParam = curProblem.getMaxValues().get(i);
+				}
 			}
 			neighbourPoint.add(newParam);
 		}
@@ -103,20 +103,16 @@ public class SimpleHillClimbing {
 
 	private static void iterateAllParams(){
 		ArrayList<Problem> problems = new ArrayList<Problem>();
-
 		//problems.add(new P1());
 		//problems.add(new P2());
 		problems.add(new RevAckley());
 
 		int[] iterations = new int[3];
-
 		iterations[0] = 10;
 		iterations[1] = 100;
 		iterations[2] = 200;
 
-
 		int[] neighbours = new int[3];
-
 		neighbours[0] = 10;
 		neighbours[1] = 100;
 		neighbours[2] = 200;
@@ -129,29 +125,30 @@ public class SimpleHillClimbing {
 		for (Problem p : problems)
 		{
 			SimpleHillClimbing test = new SimpleHillClimbing(p);
-
+			System.out.println("---------------------Next Problem---------------------");
 			for (int i = 0; i < iterations.length; i++) {
 				for (int n = 0; n < neighbours.length; n++) {
 					for (int s = 0; s < stepSizes.length; s++)
 					{
 						var point = test.findOptima(iterations[i],stepSizes[s],neighbours[n]);
-						System.out.println("Iterations:" + iterations[i] + " Stepsize:"+stepSizes[s]+ " Neighbours:" + neighbours[n]);
-						System.out.println(point + " - "+ p.EvalCallCount+ " - " + p.Eval(point));
+						//System.out.println("Iterations:" + iterations[i] + " Stepsize:"+stepSizes[s]+ " Neighbours:" + neighbours[n]);v
+						System.out.println("Iterations:" + iterations[i] + "\tStepsize:" + stepSizes[s]+ "\tNeighbours:" + neighbours[n]+ "\t"+ p.EvalCallCount+ "\t" + p.Eval(point)+ "\t" + point);
 						p.ResetEvalCallCount();
 					}
 				}
 			}
 		}
 	}
-
-	public static void main(String[] args) {
-
+	public static void runOne(){
 		Problem p = new RevAckley();
 		SimpleHillClimbing test = new SimpleHillClimbing(p);
-		var point = test.findOptima(1000000,0.001,30);
+		var point = test.findOptima(1000000,0.1,100);
 		System.out.println(point);
 		System.out.println(p.Eval(point));
 		System.out.println(p.EvalCallCount);
+}
+	public static void main(String[] args) {
+		runOne();
 		//iterateAllParams();
 	}
 }
