@@ -1,5 +1,6 @@
 package HillClimb;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -15,8 +16,9 @@ public class SimpleHillClimbing {
 
 	public ArrayList<Double> findOptima(int iterations, double stepSize, int neighbours) {
 
-		double bestGlobal = Double.MIN_VALUE;
+
 		ArrayList<Double> bestGlobalPoint = this.getRandomPoint();
+		double bestGlobal = this.curProblem.Eval(bestGlobalPoint);
 
 		for (int i = 0; i < iterations; i++) {
 			boolean shouldContinue;
@@ -131,8 +133,8 @@ public class SimpleHillClimbing {
 					for (int s = 0; s < stepSizes.length; s++)
 					{
 						var point = test.findOptima(iterations[i],stepSizes[s],neighbours[n]);
-						//System.out.println("Iterations:" + iterations[i] + " Stepsize:"+stepSizes[s]+ " Neighbours:" + neighbours[n]);v
-						System.out.println("Iterations:" + iterations[i] + "\tStepsize:" + stepSizes[s]+ "\tNeighbours:" + neighbours[n]+ "\t"+ p.EvalCallCount+ "\t" + p.Eval(point)+ "\t" + point);
+						System.out.println("Iterations:" + iterations[i] + "\tStepsize:" + stepSizes[s]+ "\tNeighbours:" + neighbours[n]+
+								"\t"+ p.EvalCallCount+ "\t" + String.format("%.14f", p.Eval(point))+ "\t" + point);
 						p.ResetEvalCallCount();
 					}
 				}
@@ -142,13 +144,32 @@ public class SimpleHillClimbing {
 	public static void runOne(){
 		Problem p = new RevAckley();
 		SimpleHillClimbing test = new SimpleHillClimbing(p);
-		var point = test.findOptima(1000000,0.1,100);
+		var point = test.findOptima(100000,0.1,100);
 		System.out.println(point);
 		System.out.println(p.Eval(point));
 		System.out.println(p.EvalCallCount);
 }
+	public static void evalBest(){
+		var p1Top = new ArrayList<Double>();
+		p1Top.add(0.0);
+		p1Top.add(0.0);
+		System.out.println("P1 top eval: " + new P1().Eval(p1Top));
+
+		var p2Top = new ArrayList<Double>();
+		p2Top.add(1.6973307015218115);
+		p2Top.add(1.6973307015218115);
+		System.out.println("P2 top eval: " + new P2().Eval(p2Top));
+
+		var revAckleyTop = new ArrayList<Double>();
+		revAckleyTop.add(0.0);
+		revAckleyTop.add(0.0);
+		System.out.println("RevAckley top eval: " + new RevAckley().Eval(revAckleyTop));
+
+
+	}
 	public static void main(String[] args) {
-		runOne();
-		//iterateAllParams();
+		//runOne();
+		iterateAllParams();
+		evalBest();
 	}
 }
