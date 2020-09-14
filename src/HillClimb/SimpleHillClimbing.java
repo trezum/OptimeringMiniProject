@@ -1,8 +1,12 @@
 package HillClimb;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 public class SimpleHillClimbing {
@@ -22,6 +26,11 @@ public class SimpleHillClimbing {
 
 		for (int i = 0; i < iterations; i++) {
 			boolean shouldContinue;
+
+			// Hack for increasing exploitation temporarily, for a P2 Experiment.
+			//var bestPoint = new ArrayList<Double>();
+			//bestPoint.add(1.6973296405794807);
+			//bestPoint.add(1.6973296405794807);
 
 			// Select a random value as a starting point aka 'best solution'
 			ArrayList<Double> bestPoint = this.getRandomPoint();
@@ -105,8 +114,8 @@ public class SimpleHillClimbing {
 
 	private static void iterateAllParams(){
 		ArrayList<Problem> problems = new ArrayList<Problem>();
-		//problems.add(new P1());
-		//problems.add(new P2());
+		problems.add(new P1());
+		problems.add(new P2());
 		problems.add(new RevAckley());
 
 		int[] iterations = new int[3];
@@ -124,6 +133,11 @@ public class SimpleHillClimbing {
 		stepSizes[1] = 0.01;
 		stepSizes[2] = 0.001;
 
+		Locale currentLocale = Locale.getDefault();
+		DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(currentLocale);
+		otherSymbols.setDecimalSeparator(',');
+		DecimalFormat df = new DecimalFormat("#.####################", otherSymbols);
+
 		for (Problem p : problems)
 		{
 			SimpleHillClimbing test = new SimpleHillClimbing(p);
@@ -133,8 +147,12 @@ public class SimpleHillClimbing {
 					for (int s = 0; s < stepSizes.length; s++)
 					{
 						var point = test.findOptima(iterations[i],stepSizes[s],neighbours[n]);
-						System.out.println("Iterations:" + iterations[i] + "\tStepsize:" + stepSizes[s]+ "\tNeighbours:" + neighbours[n]+
-								"\t"+ p.EvalCallCount+ "\t" + String.format("%.14f", p.Eval(point))+ "\t" + point);
+						//For console
+						System.out.println("Iterations:" + iterations[i] + "\tStepsize:" + stepSizes[s]+ "\tNeighbours:" + neighbours[n]+"\t"+ p.EvalCallCount+ "\t" + String.format("%.14f", p.Eval(point))+ "\t" + point);
+
+						//For excel
+						//System.out.println(iterations[i] + "\t" + stepSizes[s]+ "\t" + neighbours[n]+"\t"+ p.EvalCallCount+ "\t" + df.format(p.Eval(point))+ "\t" + point);
+
 						p.ResetEvalCallCount();
 					}
 				}
@@ -142,9 +160,9 @@ public class SimpleHillClimbing {
 		}
 	}
 	public static void runOne(){
-		Problem p = new RevAckley();
+		Problem p = new P2();
 		SimpleHillClimbing test = new SimpleHillClimbing(p);
-		var point = test.findOptima(100000,0.1,100);
+		var point = test.findOptima(1000000,0.00001,100);
 		System.out.println(point);
 		System.out.println(p.Eval(point));
 		System.out.println(p.EvalCallCount);
@@ -156,19 +174,38 @@ public class SimpleHillClimbing {
 		System.out.println("P1 top eval: " + new P1().Eval(p1Top));
 
 		var p2Top = new ArrayList<Double>();
-		p2Top.add(1.6973307015218115);
-		p2Top.add(1.6973307015218115);
+		p2Top.add(1.6973307014531214);
+		p2Top.add(1.6973307025972542);
 		System.out.println("P2 top eval: " + new P2().Eval(p2Top));
 
 		var revAckleyTop = new ArrayList<Double>();
 		revAckleyTop.add(0.0);
 		revAckleyTop.add(0.0);
 		System.out.println("RevAckley top eval: " + new RevAckley().Eval(revAckleyTop));
+	}
+	private static void evalP2Points() {
+		//Point from experimentation
+		//[1.6973296405794807, 1.697333243601135]
 
+		var p2Found = new ArrayList<Double>();
+		p2Found.add(1.6973296405794807);
+		p2Found.add(1.697333243601135);
+		System.out.println("P2 found point: " + new P2().Eval(p2Found));
+
+		var p2Left = new ArrayList<Double>();
+		p2Left.add(1.6973296405794807);
+		p2Left.add(1.6973296405794807);
+		System.out.println("P2 repeated left: " + new P2().Eval(p2Left));
+
+		var p2Right = new ArrayList<Double>();
+		p2Right.add(1.697333243601135);
+		p2Right.add(1.697333243601135);
+		System.out.println("P2 repeated right: " + new P2().Eval(p2Right));
 
 	}
 	public static void main(String[] args) {
 		//runOne();
+		//evalP2Points();
 		iterateAllParams();
 		evalBest();
 	}
